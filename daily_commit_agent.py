@@ -1,6 +1,6 @@
 """
 Daily commit agent — stages all changes, commits with a Claude-generated message,
-pushes to 'develop', and opens a PR to 'main' if one isn't already open.
+pushes to 'develop', and opens a weekly PR to 'main' on Fridays.
 """
 
 import json
@@ -8,6 +8,7 @@ import os
 import subprocess
 import urllib.error
 import urllib.request
+from datetime import date
 from pathlib import Path
 
 import anthropic
@@ -77,7 +78,11 @@ def main():
     git(["push", "origin", BRANCH], capture=False)
     print(f"Pushed to {BRANCH}.")
 
-    # Open PR if none exists
+    # Open a PR on Fridays only (weekday 4 = Friday)
+    if date.today().weekday() != 4:
+        print("Not Friday — skipping PR.")
+        return
+
     open_prs = github(
         f"/repos/{GITHUB_OWNER}/{GITHUB_REPO}/pulls"
         f"?state=open&head={GITHUB_OWNER}:{BRANCH}&base={BASE_BRANCH}",
@@ -87,9 +92,10 @@ def main():
         print(f"PR already open: {open_prs[0]['html_url']}")
         return
 
+    week = date.today().strftime("%Y-W%V")
     pr_body = ask_claude(
         f"Write a short pull request description (2-3 bullet points) summarising "
-        f"these changes. Reply with the description only:\n\n{diff[:4000]}",
+        f"this week's changes. Reply with the description only:\n\n{diff[:4000]}",
         client,
         max_tokens=400,
     )
@@ -97,7 +103,7 @@ def main():
         f"/repos/{GITHUB_OWNER}/{GITHUB_REPO}/pulls",
         method="POST",
         data={
-            "title": commit_msg.splitlines()[0],
+            "title": f"Weekly update {week}",
             "body": pr_body,
             "head": BRANCH,
             "base": BASE_BRANCH,
