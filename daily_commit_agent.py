@@ -70,12 +70,14 @@ def main():
     # Commit
     commit_msg = ask_claude(
         f"Write a concise git commit message (subject line + optional short body) "
-        f"for this diff. Reply with the message only:\n\n{diff[:4000]}"
+        f"for this diff. Reply with the message only:\n\n{diff[:4000]}",
+        client,
     )
     git(["commit", "-m", commit_msg], capture=False)
 
-    # Push
-    git(["push", "origin", BRANCH], capture=False)
+    # Push (token injected at runtime so it never lives in the remote URL)
+    push_url = f"https://{token}@github.com/{GITHUB_OWNER}/{GITHUB_REPO}.git"
+    git(["push", push_url, BRANCH], capture=False)
     print(f"Pushed to {BRANCH}.")
 
     # Open a PR on Fridays only (weekday 4 = Friday)
