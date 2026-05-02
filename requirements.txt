@@ -1,0 +1,16 @@
+# Core RAG pipeline
+llama-index-core>=0.11.0
+llama-index-llms-anthropic          # Claude as the LLM
+llama-index-embeddings-huggingface  # local BAAI/bge-small-en-v1.5 embeddings
+sentence-transformers               # required by HuggingFaceEmbedding + reranker
+
+# Environment / utilities
+anthropic
+python-dotenv
+nest-asyncio
+
+# Ragas evaluation (uses Claude directly — no extra API key)
+ragas
+langchain-anthropic                 # Claude wrapper for LangChain/Ragas
+langchain-huggingface               # HuggingFace embeddings wrapper for Ragas
+datasets                            # HuggingFace datasets (Ragas input format)

@@ -1,0 +1,15 @@
+# Secrets
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# LlamaIndex / vector store indices (large binary/JSON blobs)
+merging_index/
+sentence_index/
+
+# Claude Code settings
+.claude/
