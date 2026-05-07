@@ -5,3 +5,8 @@
 # The evaluate_pipeline() function uses claude-haiku for scoring but Settings.llm is typically set to claude-3-5-sonnet;
 # consider adding an explicit `eval_llm` parameter to allow cheaper/faster evaluation without changing the RAG LLM,
 # or document why Haiku's brevity constraints (max_tokens=5) are appropriate for 0.0–1.0 decimal scoring vs. richer reasoning.
+
+# [2026-05-07]
+# The evaluate_pipeline() function calls query_engine.query() once per question but then makes
+# TWO separate API calls (faithfulness + answer_relevancy), when a single Claude message with
+# both prompts could reduce latency and token waste by ~40% while keeping scoring independent.
